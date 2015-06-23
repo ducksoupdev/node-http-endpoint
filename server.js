@@ -23,12 +23,19 @@ var formatRequest = function(body) {
 
 var getMove = function() {
     var move = "ROCK";
-    if (currentGame.moves.length > 0 &&
-        currentGame.moves[currentGame.moves.length -1] === 'ROCK' &&
-        currentGame.dynamiteCount > 0) {
-        move = 'DYNAMITE';
-        currentGame.dynamiteCount--;
-    } 
+    var gameLength = currentGame.moves.length;
+    if (gameLength > 0) {
+        if (currentGame.moves[gameLength -1] === 'ROCK' &&
+            currentGame.dynamiteCount > 0) {
+            move = 'DYNAMITE';
+            currentGame.dynamiteCount--;
+        } else if (gameLength > 1 && 
+                    currentGame.moves[gameLength -1] === "DYNAMITE" &&
+                    currentGame.moves[gameLength -2] === "DYNAMITE") {
+            move = 'WATERBOMB';
+        }
+    }
+ 
     return move;
 };
 
