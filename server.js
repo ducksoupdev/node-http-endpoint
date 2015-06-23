@@ -21,6 +21,17 @@ var formatRequest = function(body) {
     return paramsObj;
 };
 
+var getMove = function() {
+    var move = "ROCK";
+    if (currentGame.moves.length > 0 &&
+        currentGame.moves[currentGame.moves.length -1] === 'ROCK' &&
+        currentGame.dynamiteCount > 0) {
+        move = 'DYNAMITE';
+        currentGame.dynamiteCount--;
+    } 
+    return move;
+};
+
 var currentGame = null;
 
 
@@ -37,9 +48,21 @@ var server = http.createServer( function(req, res) {
         });
         req.on('end', function () {
             var data = formatRequest(body);
-            if (/start/.test(req.path)) {
+            if (/start/.test(req.url)) {
+                console.log('current game');
+                console.log(currentGame);
+                if (currentGame) {
+                    console.log('Writing previous game');
+                    fs.writeFileSync('./games/' + currentGame.opponentName + '-' + new Date().toJSON(), JSON.stringify(currentGame));
+                }
                 currentGame = new Game(data.opponentName, data.pointsToWin, data.maxRounds, data.dynamiteCount);
             }
+            else if (/move/.test(req.url)) {
+                console.log('Opponent Move');
+                console.log(data.lastOpponentMove);
+                currentGame.moves.push(data.lastOpponentMove);
+            }
+
         });
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.end('post received');
@@ -50,7 +73,9 @@ var server = http.createServer( function(req, res) {
             console.log("Move");    
 
             res.writeHead(200, {'Content-Type': 'text/plain'});
-            res.end("ROCK");
+            var move = getMove();
+
+            res.end(move);
 
         }    
         
