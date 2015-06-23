@@ -48,7 +48,13 @@ var isLastFiveTheSame = function() {
 
 var getMove = function() {
     var move = "ROCK";
-    var gameLength = currentGame.moves.length;
+    var gameLength;
+    if (currentGame) {
+        gameLength = currentGame.moves.length;    
+    }else {
+        gameLength = 0;
+    }
+    
     
     if (gameLength > 0) {
         console.log('We have moves!');
@@ -65,7 +71,8 @@ var getMove = function() {
             currentGame.dynamiteCount--;
         } else if (gameLength > 1 && 
                     currentGame.moves[gameLength -1] === "DYNAMITE" &&
-                    currentGame.moves[gameLength -2] === "DYNAMITE") {
+                    currentGame.moves[gameLength -2] === "DYNAMITE" &&
+                    currentGame.moves[gameLength -3] === "DYNAMITE") {
             move = 'WATERBOMB';
         }
     }
