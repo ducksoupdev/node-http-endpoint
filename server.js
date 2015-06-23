@@ -21,10 +21,43 @@ var formatRequest = function(body) {
     return paramsObj;
 };
 
+var winners = {
+    'ROCK': 'PAPER',
+    'PAPER': 'SCISSORS',
+    'SCISSORS': 'ROCK',
+    'DYNAMITE': 'WATERBOMB',
+    'WATERBOMB': 'ROCK'
+}
+
+var isLastFiveTheSame = function() {
+    if (currentGame.moves.length < 6) {
+        return null;
+    }
+    
+    var lastSixMoves = currentGame.moves.slice(currentGame.moves.length - 6, currentGame.moves.length);
+    
+    if (lastSixMoves[0] === lastSixMoves[3] &&
+        lastSixMoves[1] === lastSixMoves[4] &&
+        lastSixMoves[2] === lastSixMoves[5]) {
+            return winners[lastSixMoves[0]];
+    }
+    
+    return null;
+};
+
 var getMove = function() {
     var move = "ROCK";
     var gameLength = currentGame.moves.length;
+    
     if (gameLength > 0) {
+        console.log('We have moves!');
+        
+        var lastMove = isLastFiveTheSame();
+        if (lastMove) {
+            console.log('last five are the same - returning: ' + lastMove);
+            return lastMove;
+        }
+        
         if (currentGame.moves[gameLength -1] === 'ROCK' &&
             currentGame.dynamiteCount > 0) {
             move = 'DYNAMITE';
@@ -39,20 +72,19 @@ var getMove = function() {
     return move;
 };
 
-var currentGame = null;
-
+var currentGame = null,
+    roundCount = 0;
 
 var server = http.createServer( function(req, res) {
     if (req.method == 'POST') {
         console.log("method = POST");
 
-
         var body = '';
-
 
         req.on('data', function (data) {
             body += data;
         });
+
         req.on('end', function () {
             var data = formatRequest(body);
             if (/start/.test(req.url)) {
@@ -71,16 +103,16 @@ var server = http.createServer( function(req, res) {
             }
 
         });
+        
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.end('post received');
     } else if (req.method === 'GET') {
         console.log("method = GET");
 
         if (/move/.test(req.url)) {
-            console.log("Move");    
-
             res.writeHead(200, {'Content-Type': 'text/plain'});
             var move = getMove();
+            console.log('Move: ' + move);
 
             res.end(move);
 
