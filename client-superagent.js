@@ -1,4 +1,5 @@
-var request = require('superagent');
+var request = require('superagent'),
+    async = require('async');
 
 // var server = 'http://172.26.53.116';
 var server = 'http://localhost';
@@ -27,33 +28,31 @@ request
     .post(server + '/start')
     .type('form')
     .send({
-        opponentName: 'Bob',
-        pointsToWin: 1000,
-        maxRounds: 1000,
-        dynamiteCount: 3
-    })
+    opponentName: 'Bob',
+    pointsToWin: 1000,
+    maxRounds: 1000,
+    dynamiteCount: 3
+})
     .end(function (err, res) {
-        // console.log(res.text);
-    });
+    // console.log(res.text);
+});
 
-
-games.forEach(function (game) {
+async.eachSeries(games, function (game, done) {
     if (game.method === 'post') {
-        
         request
             .post(server + game.url)
             .type('form')
             .send(game.params)
             .end(function (err, res) {
-            // console.log(res.text);
-        });
+                console.log('Opponent: ' + game.params.lastOpponentMove);
+                done();
+            });
     } else if (game.method === 'get') {
         request
             .get(server + game.url)
             .end(function (err, res) {
-            console.log('opponent: ' + game.params.lastOpponentMove);
-            console.log(res.text);
-            console.log(res.text + ' equals ' + game.expects + ': ' + res.text === game.expects);
-        });
+                console.log('Ours:     ' + res.text);
+                done();
+            });
     }
 });

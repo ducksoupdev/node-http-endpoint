@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ducksoupdev/node-http-endpoint",
   "dependencies": {
+    "async": "^1.2.1",
     "superagent": "^1.2.0"
   }
 }

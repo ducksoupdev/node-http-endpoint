@@ -92,7 +92,7 @@ var server = http.createServer( function(req, res) {
                 console.log('current game');
                 console.log(currentGame);
                 if (currentGame) {
-                    var dt = new Date().toJSON().replace(':', '-');
+                    var dt = new Date().toJSON().replace(/:/g, '-');
                     console.log('Writing previous game');
                     fs.writeFileSync('./games/' + currentGame.opponentName + '-' + dt, JSON.stringify(currentGame));
                 }
