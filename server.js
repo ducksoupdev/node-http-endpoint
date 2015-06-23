@@ -7,6 +7,7 @@ function Game(name, pointsToWin, maxRounds, dynamiteCount) {
     this.maxRounds = maxRounds;
     this.dynamiteCount = dynamiteCount;
     this.moves = [];
+    this.ourMoves = [];
 }
 
 var formatRequest = function(body) {
@@ -58,7 +59,7 @@ var getMove = function() {
             return lastMove;
         }
         
-        if (currentGame.moves[gameLength -1] === 'ROCK' &&
+        if (currentGame.moves[gameLength -1] === currentGame.ourMoves[currentGame.ourMoves.length - 1] &&
             currentGame.dynamiteCount > 0) {
             move = 'DYNAMITE';
             currentGame.dynamiteCount--;
@@ -112,6 +113,7 @@ var server = http.createServer( function(req, res) {
         if (/move/.test(req.url)) {
             res.writeHead(200, {'Content-Type': 'text/plain'});
             var move = getMove();
+            currentGame.ourMoves.push(move);
             console.log('Move: ' + move);
 
             res.end(move);
